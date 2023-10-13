@@ -1,3 +1,4 @@
+#![feature(iterator_try_collect)]
 #![allow(dead_code)]
 #![feature(const_fn_floating_point_arithmetic)]
 
@@ -88,6 +89,7 @@ use crate::{
     enhancements::{
         AntiAimPunsh,
         BombInfoIndicator,
+        MapVis,
         PlayerESP,
         SpectatorsListIndicator,
         TriggerBot,
@@ -98,6 +100,8 @@ use crate::{
 
 mod cache;
 mod enhancements;
+mod map;
+mod physics;
 mod radar;
 mod settings;
 mod utils;
@@ -628,6 +632,7 @@ fn main_overlay() -> anyhow::Result<()> {
             Rc::new(RefCell::new(BombInfoIndicator::new())),
             Rc::new(RefCell::new(TriggerBot::new())),
             Rc::new(RefCell::new(AntiAimPunsh::new())),
+            Rc::new(RefCell::new(MapVis::new()?)),
         ],
 
         last_total_read_calls: 0,

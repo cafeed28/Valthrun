@@ -7,6 +7,7 @@ edition = "2021"
 cs2 = { path = "../cs2" }
 cs2-schema-generated = { path = "../cs2-schema/generated" }
 cs2-schema-declaration = { path = "../cs2-schema/declaration" }
+cs2-schema-cutl = { path = "../cs2-schema/cutl" }
 valthrun-kernel-interface = { path = "../kernel/interface" }
 overlay = { path = "../overlay" }
 anyhow = "1.0.72"
@@ -38,6 +39,8 @@ utils-state = { version = "0.1.0", path = "../utils/state" }
 url = "2.5.0"
 tokio = { version = "1.36.0", features = ["full"] }
 radar-client = { version = "0.1.0", path = "../radar/client" }
+map-tracer = { path = "../map-tracer" }
+byteorder = "1.4.3"
 
 [build-dependencies]
 winres = "0.1"

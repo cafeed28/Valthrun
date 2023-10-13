@@ -16,6 +16,7 @@ members = [
     "radar/server-standalone",
     "radar/shared",
 
+    "map-tracer",
     "controller",
     "cs2",
     "overlay",
