@@ -1,4 +1,3 @@
-use anyhow::Context;
 use cs2::{
     BoneFlags,
     CEntityIdentityEx,
@@ -8,11 +7,9 @@ use cs2::{
     LocalCameraControllerTarget,
     PlayerPawnInfo,
     PlayerPawnState,
+    C4,
 };
-use cs2_schema_generated::cs2::client::{
-    C_CSPlayerPawn,
-    C_C4,
-};
+use cs2_schema_generated::cs2::client::C_CSPlayerPawn;
 use imgui::ImColor32;
 use obfstr::obfstr;
 
@@ -37,7 +34,6 @@ pub struct PlayerESP {
     toggle: KeyToggle,
     players: Vec<PlayerPawnInfo>,
     local_team_id: u8,
-    c4_owner: u32,
 }
 
 impl PlayerESP {
@@ -46,7 +42,6 @@ impl PlayerESP {
             toggle: KeyToggle::new(),
             players: Default::default(),
             local_team_id: 0,
-            c4_owner: 0,
         }
     }
 
@@ -202,16 +197,6 @@ impl Enhancement for PlayerESP {
                 .unwrap_or(false)
             {
                 /* entity is not a player pawn */
-                if !entity_class.map(|name| name == "C_C4").unwrap_or(false) {
-                    /* entity is not a bomb */
-                    continue;
-                }
-                let bomb = entity_identity
-                    .entity_ptr::<C_C4>()?
-                    .read_schema()
-                    .context("bomb scheme")?;
-                let c4_owner = bomb.m_hOwnerEntity()?.get_entity_index();
-                self.c4_owner = c4_owner;
                 continue;
             }
 
@@ -240,6 +225,7 @@ impl Enhancement for PlayerESP {
     fn render(&self, states: &utils_state::StateRegistry, ui: &imgui::Ui) -> anyhow::Result<()> {
         let settings = states.resolve::<AppSettings>(())?;
         let view = states.resolve::<ViewController>(())?;
+        let bomb_state = states.resolve::<C4>(())?;
 
         let draw = ui.get_window_draw_list();
         const UNITS_TO_METERS: f32 = 0.01905;
@@ -491,8 +477,10 @@ impl Enhancement for PlayerESP {
                 }
 
                 if esp_settings.info_flag_c4 {
-                    if self.c4_owner == entry.weapon_player_entity_id {
-                        player_flags.push("Bomb");
+                    if let Some(owner) = bomb_state.owner {
+                        if owner == entry.weapon_player_entity_id {
+                            player_flags.push("Bomb");
+                        }
                     }
                 }
 

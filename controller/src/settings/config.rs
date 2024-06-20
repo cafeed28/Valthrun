@@ -115,9 +115,6 @@ pub struct AppSettings {
     pub esp_settings_enabled: BTreeMap<String, bool>,
 
     #[serde(default = "bool_true")]
-    pub bomb_timer: bool,
-
-    #[serde(default = "bool_true")]
     pub bomb_esp: bool,
 
     #[serde(default = "default_bomb_esp_config")]

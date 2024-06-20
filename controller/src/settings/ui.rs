@@ -169,7 +169,6 @@ impl SettingsUI {
                             (KeyToggleMode::AlwaysOn, "Always On"),
                         ], &mut settings.esp_mode);
 
-                        ui.checkbox(obfstr!("Bomb Timer"), &mut settings.bomb_timer);
                         ui.checkbox(obfstr!("Bomb ESP"), &mut settings.bomb_esp);
                         ui.checkbox(obfstr!("Spectators List"), &mut settings.spectators_list);
                     }
@@ -188,7 +187,7 @@ impl SettingsUI {
                         if !settings.bomb_esp {
                             let _style = ui.push_style_color(StyleColor::Text, [ 1.0, 0.76, 0.03, 1.0 ]);
                             ui.text("Bomb has been disabled.");
-                            ui.text("Please enable ESP under \"Visuals\" \"Bomb Timer\"");
+                            ui.text("Please enable ESP under \"Visuals\" \"Bomb ESP\"");
                         } else {
                             self.render_bomb_settings(&mut *settings, ui)
                         }
@@ -1197,7 +1196,7 @@ impl SettingsUI {
 
         let _ui_enable_token = ui.begin_enabled(config_enabled);
         ui.checkbox(
-            obfstr!("Planted C4 ESP"),
+            obfstr!("C4 ESP"),
             &mut settings.bomb_esp_settings.bomb_position,
         );
         ui.checkbox(
