@@ -33,6 +33,7 @@ use crate::{
 pub struct PlayerPawnInfo {
     pub controller_entity_id: u32,
     pub team_id: u8,
+    pub weapon_player_entity_id: u32,
 
     pub player_health: i32,
     pub player_has_defuser: bool,
@@ -177,13 +178,17 @@ impl State for PlayerPawnState {
             .collect::<Result<Vec<_>>>()?;
 
         let weapon = player_pawn.m_pClippingWeapon()?.try_read_schema()?;
-        let weapon_type = if let Some(weapon) = weapon {
-            weapon
+        let (weapon_type, weapon_player_entity_id) = if let Some(weapon) = weapon {
+            let weapon_type = weapon
                 .m_AttributeManager()?
                 .m_Item()?
-                .m_iItemDefinitionIndex()?
+                .m_iItemDefinitionIndex()?;
+
+            let weapon_player_entity_id = weapon.m_hOwnerEntity()?.get_entity_index();
+
+            (weapon_type, weapon_player_entity_id)
         } else {
-            WeaponId::Knife.id()
+            (WeaponId::Knife.id(), 0)
         };
 
         let player_flashtime = player_pawn.m_flFlashBangTime()?;
@@ -191,6 +196,7 @@ impl State for PlayerPawnState {
         Ok(Self::Alive(PlayerPawnInfo {
             controller_entity_id: controller_handle.get_entity_index(),
             team_id: player_team,
+            weapon_player_entity_id,
 
             player_name,
             player_has_defuser,

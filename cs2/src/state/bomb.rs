@@ -18,7 +18,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct BombDefuser {
-    /// Totoal time remaining for a successfull bomb defuse
+    /// Total time remaining for a successfull bomb defuse
     pub time_remaining: f32,
 
     /// The defusers player name
@@ -50,11 +50,14 @@ pub struct PlantedC4 {
     /// 1 = B
     pub bomb_site: u8,
 
+    /// Current bomb defuser
+    pub defuser: Option<BombDefuser>,
+
     /// Current state of the planted C4
     pub state: PlantedC4State,
 
-    /// Current bomb defuser
-    pub defuser: Option<BombDefuser>,
+    /// Current position of planted c4
+    pub bomb_pos: Option<nalgebra::Vector3<f32>>,
 }
 
 impl State for PlantedC4 {
@@ -88,12 +91,18 @@ impl State for PlantedC4 {
                 continue;
             }
 
+            let game_screen_node = bomb.m_pGameSceneNode()?.read_schema()?;
+
+            let bomb_pos =
+                nalgebra::Vector3::<f32>::from_column_slice(&game_screen_node.m_vecAbsOrigin()?);
+
             let bomb_site = bomb.m_nBombSite()? as u8;
             if bomb.m_bBombDefused()? {
                 return Ok(Self {
                     bomb_site,
-                    defuser: None,
                     state: PlantedC4State::Defused,
+                    defuser: None,
+                    bomb_pos: Some(bomb_pos),
                 });
             }
 
@@ -102,8 +111,9 @@ impl State for PlantedC4 {
             if time_blow <= globals.time_2()? {
                 return Ok(Self {
                     bomb_site,
-                    defuser: None,
                     state: PlantedC4State::Detonated,
+                    defuser: None,
+                    bomb_pos: Some(bomb_pos),
                 });
             }
 
@@ -146,6 +156,7 @@ impl State for PlantedC4 {
                 state: PlantedC4State::Active {
                     time_detonation: time_blow - globals.time_2()?,
                 },
+                bomb_pos: Some(bomb_pos),
             });
         }
 
@@ -153,6 +164,7 @@ impl State for PlantedC4 {
             bomb_site: 0,
             defuser: None,
             state: PlantedC4State::NotPlanted,
+            bomb_pos: None,
         });
     }
 
