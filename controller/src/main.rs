@@ -631,7 +631,7 @@ fn main_overlay() -> anyhow::Result<()> {
             Rc::new(RefCell::new(SpectatorsListIndicator::new())),
             Rc::new(RefCell::new(BombInfoIndicator::new())),
             Rc::new(RefCell::new(TriggerBot::new())),
-            Rc::new(RefCell::new(AntiAimPunsh::new())),
+            // Rc::new(RefCell::new(AntiAimPunsh::new())),
             // Rc::new(RefCell::new(MapVis::new()?)),
         ],
 

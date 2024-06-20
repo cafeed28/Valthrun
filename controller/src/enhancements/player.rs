@@ -1,3 +1,4 @@
+use anyhow::Context;
 use cs2::{
     BoneFlags,
     CEntityIdentityEx,
@@ -8,7 +9,10 @@ use cs2::{
     PlayerPawnInfo,
     PlayerPawnState,
 };
-use cs2_schema_generated::cs2::client::C_CSPlayerPawn;
+use cs2_schema_generated::cs2::client::{
+    C_CSPlayerPawn,
+    C_C4,
+};
 use imgui::ImColor32;
 use obfstr::obfstr;
 
@@ -33,6 +37,7 @@ pub struct PlayerESP {
     toggle: KeyToggle,
     players: Vec<PlayerPawnInfo>,
     local_team_id: u8,
+    c4_owner: u32,
 }
 
 impl PlayerESP {
@@ -41,6 +46,7 @@ impl PlayerESP {
             toggle: KeyToggle::new(),
             players: Default::default(),
             local_team_id: 0,
+            c4_owner: 0,
         }
     }
 
@@ -196,6 +202,16 @@ impl Enhancement for PlayerESP {
                 .unwrap_or(false)
             {
                 /* entity is not a player pawn */
+                if !entity_class.map(|name| name == "C_C4").unwrap_or(false) {
+                    /* entity is not a bomb */
+                    continue;
+                }
+                let bomb = entity_identity
+                    .entity_ptr::<C_C4>()?
+                    .read_schema()
+                    .context("bomb scheme")?;
+                let c4_owner = bomb.m_hOwnerEntity()?.get_entity_index();
+                self.c4_owner = c4_owner;
                 continue;
             }
 
@@ -472,6 +488,12 @@ impl Enhancement for PlayerESP {
 
                 if esp_settings.info_flag_flashed && entry.player_flashtime > 0.0 {
                     player_flags.push("flashed");
+                }
+
+                if esp_settings.info_flag_c4 {
+                    if self.c4_owner == entry.weapon_player_entity_id {
+                        player_flags.push("Bomb");
+                    }
                 }
 
                 if !player_flags.is_empty() {

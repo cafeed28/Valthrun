@@ -20,6 +20,8 @@ use utils_state::{
 };
 
 use super::{
+    EspBombColor,
+    EspBombSettings,
     EspConfig,
     EspPlayerSettings,
     EspSelector,
@@ -74,6 +76,18 @@ fn default_esp_configs_enabled() -> BTreeMap<String, bool> {
     result
 }
 
+fn default_bomb_esp_config() -> EspBombSettings {
+    EspBombSettings {
+        bomb_site: false,
+
+        bomb_position: false,
+        bomb_position_color: EspBombColor::default(),
+
+        bomb_status: false,
+        is_safe: false,
+    }
+}
+
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, PartialOrd)]
 pub enum KeyToggleMode {
     AlwaysOn,
@@ -102,6 +116,12 @@ pub struct AppSettings {
 
     #[serde(default = "bool_true")]
     pub bomb_timer: bool,
+
+    #[serde(default = "bool_true")]
+    pub bomb_esp: bool,
+
+    #[serde(default = "default_bomb_esp_config")]
+    pub bomb_esp_settings: EspBombSettings,
 
     #[serde(default = "bool_false")]
     pub spectators_list: bool,
